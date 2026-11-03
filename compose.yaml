@@ -1,0 +1,60 @@
+name: meraki-videowall
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    init: true
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      APP_USERNAME: ${APP_USERNAME:-admin}
+      APP_PASSWORD: ${APP_PASSWORD:?Definir un mot de passe de 12 caracteres minimum}
+      MERAKI_API_KEY: ${MERAKI_API_KEY:-}
+      MERAKI_ORGANIZATION_ID: ${MERAKI_ORGANIZATION_ID:-}
+      DEMO_MODE: ${DEMO_MODE:-false}
+      MEDIAMTX_API_URL: http://mediamtx:9997
+      MEDIAMTX_WEBRTC_URL: http://mediamtx:8889
+    depends_on:
+      mediamtx:
+        condition: service_started
+    networks: [web, media]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+  mediamtx:
+    image: bluenviron/mediamtx:1.21.3
+    restart: unless-stopped
+    environment:
+      MTX_WEBRTCADDITIONALHOSTS: ${SERVER_LAN_IP:?Definir l IP LAN de la VM Ubuntu}
+    volumes:
+      - ./deploy/mediamtx.yml:/mediamtx.yml:ro
+    ports:
+      - "8189:8189/udp"
+      - "8189:8189/tcp"
+    networks: [media]
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+  caddy:
+    image: caddy:2.10.2-alpine
+    restart: unless-stopped
+    environment:
+      APP_HOST: ${SERVER_LAN_IP:?Definir l IP LAN de la VM Ubuntu}
+    ports:
+      - "${HTTPS_PORT:-443}:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+    networks: [web]
+    security_opt: [no-new-privileges:true]
+networks:
+  web:
+  media:
+volumes:
+  caddy_data:
+  caddy_config:

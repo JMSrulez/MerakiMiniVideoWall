@@ -1,0 +1,30 @@
+logLevel: info
+api: true
+apiAddress: :9997
+authMethod: internal
+authInternalUsers:
+  - user: any
+    ips: []
+    permissions:
+      - action: api
+      - action: read
+        path: "~^cam-[a-f0-9]{24}$"
+rtsp: false
+rtmp: false
+hls: false
+srt: false
+moq: false
+playback: false
+webrtc: true
+webrtcAddress: :8889
+webrtcLocalUDPAddress: :8189
+webrtcLocalTCPAddress: :8189
+webrtcIPsFromInterfaces: false
+webrtcICEServers2: []
+pathDefaults:
+  sourceOnDemand: true
+  sourceOnDemandStartTimeout: 15s
+  sourceOnDemandCloseAfter: 10s
+  rtspTransport: tcp
+  record: false
+paths: {}
