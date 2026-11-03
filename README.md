@@ -1,4 +1,4 @@
-# Meraki Video Wall
+# Meraki mini Video Wall
 
 Videowall web pour cameras Cisco Meraki MV : liste a gauche, quatre emplacements,
 filtre par reseau, recherche, plein ecran, reconnexion et disposition memorisee.
